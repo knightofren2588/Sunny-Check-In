@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sunny's Daily Check-In</title>
+</head>
+<body>
+  <div style="max-width: 480px; margin: auto; padding: 20px; background: #fffce6; border: 3px solid #ffd93d; border-radius: 20px; font-family: Arial, sans-serif;">
+    <h2 style="color: #f4a100;">🦆 Sunny's Daily Check-In</h2>
+
+    <form id="sunnyPoll" onsubmit="submitSunnyPoll(); return false;">
+      <label><input type="radio" name="response" value="Safe and Supported" required /> Safe and Supported</label><br>
+      <label><input type="radio" name="response" value="Stressed, but trying" /> Stressed, but trying</label><br>
+      <label><input type="radio" name="response" value="Need someone to talk to" /> Need someone to talk to</label><br>
+      <label><input type="radio" name="response" value="Ready to Shine like Sunny!" /> Ready to Shine like Sunny!</label><br><br>
+
+      <button type="submit" style="background: #ffd93d; border: none; padding: 10px 16px; font-weight: bold; border-radius: 8px; cursor: pointer;">Submit</button>
+    </form>
+
+    <div id="thank-you" style="display: none; color: green; font-weight: bold; margin-top: 10px;">
+      ✅ Thanks for checking in with Sunny!
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3>📊 Live Results</h3>
+      <ul style="line-height: 1.6;">
+        <li>Safe and Supported: <span id="count-safe">0</span></li>
+        <li>Stressed, but trying: <span id="count-stressed">0</span></li>
+        <li>Need someone to talk to: <span id="count-need">0</span></li>
+        <li>Ready to Shine like Sunny!: <span id="count-ready">0</span></li>
+        <li><strong>Total Check-Ins:</strong> <span id="count-total">0</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyAXiSTJ2ANmykY7AFk0TbQwkmtmaIC5IAesTIUZD2C3HCvrseyU3Ca9VS3YkPOPHmjxQ/exec";
+
+    function submitSunnyPoll() {
+      const selected = document.querySelector('input[name="response"]:checked');
+      if (!selected) return;
+
+      fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ response: selected.value })
+      })
+      .then(() => {
+        document.getElementById("sunnyPoll").reset();
+        document.getElementById("thank-you").style.display = "block";
+        fetchSunnyVotes();
+      })
+      .catch(() => alert("⚠️ Could not submit your response."));
+    }
+
+    async function fetchSunnyVotes() {
+      try {
+        const res = await fetch(ENDPOINT);
+        const results = await res.json();
+
+        document.getElementById("count-safe").textContent = results.safe;
+        document.getElementById("count-stressed").textContent = results.stressed;
+        document.getElementById("count-need").textContent = results.need;
+        document.getElementById("count-ready").textContent = results.ready;
+        document.getElementById("count-total").textContent = results.safe + results.stressed + results.need + results.ready;
+      } catch (err) {
+        console.error("❌ Counter load error:", err);
+        document.getElementById("count-total").textContent = "⚠️ Load failed";
+      }
+    }
+
+    fetchSunnyVotes();
+    setInterval(fetchSunnyVotes, 30000); // refresh every 30 seconds
+  </script>
+</body>
+</html>
