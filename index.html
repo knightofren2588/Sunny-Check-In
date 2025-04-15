@@ -31,7 +31,7 @@
   </div>
 
   <script>
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbyaAngSN9eCXeZFA3l5mjb4PvPq_8Dim5dTFVoKD9aTk08js0edQiEGb6bRBVPLxYXs/exec";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbzDVshWlltT2Ht8PXNJdmP_SMSXkZcTGHdqT1bu4IakT-L54F8n5BmNQnquxiYr5hNV/exec";
     const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7StNRFQPq1y_bsziEGShs7PJsAr7LwyanuVWlXQZ0qVEiC1K5nTplxkPqc4hTP3lZP8lBaKQTcxEY/pub?output=csv";
 
     function submitSunnyPoll() {
@@ -48,7 +48,7 @@
         if (data.status === "success") {
           document.getElementById("sunnyPoll").reset();
           document.getElementById("thank-you").style.display = "block";
-          fetchSunnyVotes();
+          fetchSunnyVotes(); // Update tally
         } else {
           alert("⚠️ Submission error: " + data.message);
         }
