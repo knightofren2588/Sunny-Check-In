@@ -31,49 +31,46 @@
   </div>
 
   <script>
-    const ENDPOINT = "https://script.google.com/macros/s/AKfycbx88pHwuPHR6q2-d_Hv6B42FHFFsvENbinbWfa7BgHW9jhIbcbsaRMqmr7EN6eI9kca/exec";
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ7StNRFQPq1y_bsziEGShs7PJsAr7LwyanuVWlXQZ0qVEiC1K5nTplxkPqc4hTP3lZP8lBaKQTcxEY/pub?output=csv";
+    const ENDPOINT = "https://script.google.com/macros/s/AKfycbznU9Dk0F-o4144Kl0dZ8wozbUXtWupfXdWGLUk26xkb1yYdEH1yhhREd8amfbRld1Y/exec";
 
-    function submitSunnyPoll() {
-      const selected = document.querySelector('input[name="response"]:checked');
-      if (!selected) return;
+function submitSunnyPoll() {
+  const selected = document.querySelector('input[name="response"]:checked');
+  if (!selected) return;
 
-      fetch(ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ response: selected.value })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "success") {
-          document.getElementById("sunnyPoll").reset();
-          document.getElementById("thank-you").style.display = "block";
-          fetchSunnyVotes(); // Update tally
-        } else {
-          alert("⚠️ Submission error: " + data.message);
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("⚠️ Could not submit your response.");
-      });
+  fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ response: selected.value })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === "success") {
+      document.getElementById("sunnyPoll").reset();
+      document.getElementById("thank-you").style.display = "block";
+      fetchSunnyVotes(); // update tally
+    } else {
+      alert("⚠️ Submission error: " + data.message);
     }
+  })
+  .catch(err => {
+    console.error(err);
+    alert("⚠️ Could not submit your response.");
+  });
+}
 
-    async function fetchSunnyVotes() {
-      try {
-        const res = await fetch(SHEET_CSV_URL);
-        const text = await res.text();
-        const rows = text.trim().split("\n").slice(1); // Skip header
-        const total = rows.length;
-        document.getElementById("count-total").textContent = total;
-      } catch (err) {
-        console.error("Failed to fetch results:", err);
-        document.getElementById("count-total").textContent = "⚠️ Load failed";
-      }
-    }
+async function fetchSunnyVotes() {
+  try {
+    const res = await fetch(ENDPOINT);
+    const data = await res.json();
+    document.getElementById("count-total").textContent = data.totalCheckIns;
+  } catch (err) {
+    console.error("Failed to fetch results:", err);
+    document.getElementById("count-total").textContent = "⚠️ Load failed";
+  }
+}
 
-    fetchSunnyVotes();
-    setInterval(fetchSunnyVotes, 30000); // Refresh every 30 seconds
+fetchSunnyVotes();
+setInterval(fetchSunnyVotes, 30000);
   </script>
 </body>
 </html>
